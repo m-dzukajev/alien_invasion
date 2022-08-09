@@ -52,6 +52,9 @@ class AlienInvasion:
 
     def _start_game(self):
         """Начать новую игру"""
+        # Сброс игровых настроек.
+        self.settings.initialize_dynamic_settings()
+
         # Сброс игровой статистики.
         self.stats.reset_stats()
         self.stats.game_active = True
@@ -133,6 +136,7 @@ class AlienInvasion:
             # Уничтожение существующих снарядов и создание нового флота.
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
     def _create_fleet(self):
         """Create the fleet of aliens."""

@@ -50,6 +50,23 @@ class AlienInvasion:
 
             self._update_screen()
 
+    def _start_game(self):
+        """Начать новую игру"""
+        # Сброс игровой статистики.
+        self.stats.reset_stats()
+        self.stats.game_active = True
+
+        # Очистка списков пришельцев и снарядов.
+        self.aliens.empty()
+        self.bullets.empty()
+
+        # Создание нового флота и размещение корабля в центре.
+        self._create_fleet()
+        self.ship.center_ship()
+
+        # Указатель мыши скрывается.
+        pygame.mouse.set_visible(False)
+
     def _check_events(self):
         # Отслеживание событий клавиатуры и мыши.
         for event in pygame.event.get():
@@ -75,6 +92,8 @@ class AlienInvasion:
             self._fire_bullet()
         if event.key == pygame.K_q:
             sys.exit()
+        if event.key == pygame.K_p and not self.stats.game_active:
+            self._start_game()
 
     def _check_keyup_events(self, event):
         """Реагирует на отпускание клавиш."""
@@ -87,20 +106,7 @@ class AlienInvasion:
         """Запускает новую игру при нажатии кнопки Play."""
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
-            # Сброс игровой статистики.
-            self.stats.reset_stats()
-            self.stats.game_active = True
-
-            # Очистка списков пришельцев и снарядов.
-            self.aliens.empty()
-            self.bullets.empty()
-
-            # Создание нового флота и размещение корабля в центре.
-            self._create_fleet()
-            self.ship.center_ship()
-
-            # Указатель мыши скрывается.
-            pygame.mouse.set_visible(False)
+            self._start_game()
 
     def _fire_bullet(self):
         """Создание нового снаряда и включение его в группу bullets."""

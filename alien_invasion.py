@@ -1,4 +1,5 @@
 import sys
+import json
 from time import sleep
 
 import pygame
@@ -68,6 +69,7 @@ class AlienInvasion:
         self.stats.game_active = True
         self.sb.prep_score()
         self.sb.prep_level()
+        self.sb.prep_ships()
         # Очистка списков пришельцев и снарядов.
         self.aliens.empty()
         self.bullets.empty()
@@ -116,7 +118,7 @@ class AlienInvasion:
         # Отслеживание событий клавиатуры и мыши.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                self._close_game()
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
@@ -137,7 +139,7 @@ class AlienInvasion:
         if event.key == pygame.K_SPACE:
             self._fire_bullet()
         if event.key == pygame.K_q:
-            sys.exit()
+            self._close_game()
         if event.key == pygame.K_p and not self.stats.game_active:
             self._start_game()
 
@@ -192,7 +194,6 @@ class AlienInvasion:
             self.stats.level += 1
             self.sb.prep_level()
 
-
     def _create_fleet(self):
         """Create the fleet of aliens."""
         # Make an alien.
@@ -223,7 +224,9 @@ class AlienInvasion:
         """Обрабатывает столкновение корабля с пришельцем."""
         # Уменьшение ships_left.
         if self.stats.ships_left > 0:
+            # Уменьшение ships_left и обновление панели счета
             self.stats.ships_left -= 1
+            self.sb.prep_ships()
             # Очистка списков пришельцев и снарядов.
             self.aliens.empty()
             self.bullets.empty()
@@ -294,6 +297,15 @@ class AlienInvasion:
             self.difficult_button.draw_button()
         # Отображение последнего прорисованного экрана.
         pygame.display.flip()
+
+    def _close_game(self):
+        """Сохраняем результат и выходим"""
+        saved_high_score = self.stats.get_saved_high_score()
+        if self.stats.high_score > saved_high_score:
+            with open('high_score.json', 'w') as f:
+                json.dump(self.stats.high_score, f)
+
+        sys.exit()
 
 
 if __name__ == '__main__':
